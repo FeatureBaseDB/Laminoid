@@ -63,8 +63,9 @@ else
   sudo apt-get install linux-headers-5.10.0-24-cloud-amd64 -y
 
   # install cuda drivers
+  cd /root/
   wget -q https://storage.googleapis.com/sloth-services/cuda_11.8.0_520.61.05_linux.run.3
-  bash cuda_11.8.0_520.61.05_linux.run --silent
+  bash cuda_11.8.0_520.61.05_linux.run.3 --silent
 
   # ai junk
   pip install --upgrade huggingface_hub
