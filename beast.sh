@@ -51,30 +51,32 @@ else
   date >> /opt/start.time
 
   apt-get update -y
+
+  apt-get install apache2-utils -y
+  apt-get install nginx -y
   apt-get install build-essential -y
-  
   apt-get install unzip -y
   apt-get install python3-pip -y
-  pip install --upgrade huggingface_hub
+  apt-get install git -y
   
   # 5.10.0-24-cloud-amd64 headers
   sudo apt-get install linux-headers-5.10.0-24-cloud-amd64 -y
 
   # install cuda drivers
   wget -q https://storage.googleapis.com/sloth-services/cuda_11.8.0_520.61.05_linux.run.3
-  # bash cuda_11.8.0_520.61.05_linux.run --silent
+  bash cuda_11.8.0_520.61.05_linux.run --silent
+
+  # ai junk
+  pip install --upgrade huggingface_hub
+  pip install vllm 
 
   # download code
-  apt-get install git -y
   cd /opt/
   git clone https://github.com/FeatureBaseDB/Laminoid.git
   cd /opt/Laminoid/
 
+  # copy files
   cp token.py /root/
-
-  apt-get install apache2-utils -y
-  apt-get install nginx -y
-  
   cp nginx.conf.beast /etc/nginx/nginx.conf
 
   # grab the tokens and write to nginx htpasswrd and env
@@ -83,6 +85,9 @@ else
 
   # start training
   # ./start-training.sh
+
+  # start ai
+  # ./start-ai.sh
 
   # restart ngninx
   systemctl restart nginx.service
