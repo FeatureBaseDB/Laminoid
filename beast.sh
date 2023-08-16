@@ -19,13 +19,16 @@ case $OPTION in
 esac
 
 case $ZONE in
-    us-west1-a)
-       echo "Using $ZONE to start weaviate...";
-       ;;
+    us-central1-a)
+        echo "Using $ZONE to start beast..."
+        ;;
+    us-east1-b)
+        echo "Using $ZONE to start beast..."
+        ;;
     *)
-       echo "Need a valid zone to start...such as us-west1-a";   
-       exit;
-       ;;
+        echo "Need a valid zone to start, such as us-central1-a or us-east1-b"
+        exit
+        ;;
 esac
 
 if [ -f secrets.sh ]; then
@@ -41,35 +44,33 @@ fi
 
 SCRIPT=$(cat <<EOF
 #!/bin/bash
-if [ -d "/opt/mitta-services/weaviate/" ]; then
-  echo "starting weaviate"
-
+if [ -d "/opt/beast/" ]; then
+  echo "starting beast"
 else
   sudo su -
   date >> /opt/start.time
 
   apt-get update -y
   apt-get install build-essential -y
-  apt-get install linux-headers-$(uname -r) -y
-
+  
   apt-get install unzip -y
   apt-get install python3-pip -y
   pip install --upgrade huggingface_hub
   
+  # 5.10.0-24-cloud-amd64 headers
+  sudo apt-get install linux-headers-5.10.0-24-cloud-amd64 -y
+
   # install cuda drivers
-  wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda_11.8.0_520.61.05_linux.run
-  bash cuda_11.8.0_520.61.05_linux.run --silent
+  wget -q https://storage.googleapis.com/sloth-services/cuda_11.8.0_520.61.05_linux.run.3
+  # bash cuda_11.8.0_520.61.05_linux.run --silent
 
-  #entropy
-  apt-get -y install rng-tools
-  cat "RNGDEVICE=/dev/urandom" >> /etc/default/rng-tools
-  /etc/init.d/rng-tools restart
-
+  # download code
+  apt-get install git -y
   cd /opt/
   git clone https://github.com/FeatureBaseDB/Laminoid.git
   cd /opt/Laminoid/
 
-  cp get_token.py /root/
+  cp token.py /root/
 
   apt-get install apache2-utils -y
   apt-get install nginx -y
@@ -78,13 +79,10 @@ else
 
   # grab the tokens and write to nginx htpasswrd and env
   cd /root
-  python3 get_token.py beast
+  python3 token.py beast
 
   # start training
   # ./start-training.sh
-
-  # grab the token and write to nginx htpasswrd
-  python3 get_token.py beast
 
   # restart ngninx
   systemctl restart nginx.service
