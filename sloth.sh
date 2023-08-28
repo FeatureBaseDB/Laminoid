@@ -1,6 +1,6 @@
 #!/bin/bash
-TYPE=a2-highgpu-1g
-NAME=beast
+TYPE=g2-standard-24
+NAME=sloth
 NEW_UUID=$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom | head -c 4 ; echo)
 
 ZONE=$2
@@ -22,7 +22,7 @@ case $ZONE in
     us-central1-a)
         echo "Using $ZONE to start beast..."
         ;;
-    us-central1-f)
+    us-east1-b)
         echo "Using $ZONE to start beast..."
         ;;
     *)
@@ -44,7 +44,7 @@ fi
 
 SCRIPT=$(cat <<EOF
 #!/bin/bash
-if [ -d "/opt/beast/" ]; then
+if [ -d "/opt/Laminoid/" ]; then
   echo "starting beast"
 else
   sudo su -
@@ -58,18 +58,22 @@ else
   apt-get install unzip -y
   apt-get install python3-pip -y
   apt-get install git -y
-  
-  # 5.10.0-24-cloud-amd64 headers
-  sudo apt-get install linux-headers-5.10.0-24-cloud-amd64 -y
+  apt-get install gcc -y
 
+  # 5.10.0-24-cloud-amd64 headers
+  # sudo apt-get install linux-headers-5.10.0-24-cloud-amd64 -y
+  # sudo apt-get install linux-headers-5.15.0-1039-gcp
+  
   # install cuda drivers
   cd /root/
-  wget -q https://storage.googleapis.com/sloth-services/cuda_11.8.0_520.61.05_linux.run.3
-  bash cuda_11.8.0_520.61.05_linux.run.3 --silent
+  # wget -q https://storage.googleapis.com/sloth-services/cuda_11.8.0_520.61.05_linux.run.3
+  # bash cuda_11.8.0_520.61.05_linux.run.3 --silent
+  curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py
+  python3 /root/install_gpu_driver.py
 
   # ai junk
   pip install --upgrade huggingface_hub
-  pip install vllm 
+  # pip install vllm 
 
   # download code
   cd /opt/
@@ -112,8 +116,8 @@ gcloud compute instances create $NAME-$NEW_UUID \
 --instance-termination-action=STOP \
 --service-account=291267903070-compute@developer.gserviceaccount.com \
 --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
---accelerator=count=1,type=nvidia-tesla-a100 \
---create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/debian-cloud/global/images/debian-11-bullseye-v20230814,mode=rw,size=500,type=projects/sloth-compute/zones/us-central1-a/diskTypes/pd-ssd \
+--accelerator=count=2,type=nvidia-l4 \
+--create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/ml-images/global/images/c0-deeplearning-common-gpu-v20230807-debian-11-py310,mode=rw,size=200,type=projects/sloth-compute/zones/us-central1-a/diskTypes/pd-ssd \
 --no-shielded-secure-boot \
 --shielded-vtpm \
 --shielded-integrity-monitoring \
