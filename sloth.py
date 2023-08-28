@@ -10,7 +10,7 @@ def embed():
     if request.method == 'POST':
         data = request.json  # Assuming the data is sent as JSON in the request body
 
-        embeddings = model.encode(["consider the animal type:", data.get('sentence')]).tolist()
+        embeddings = model.encode([data.get('sentence')]).tolist()
 
         # Process the data and generate a response
         response_data = {
