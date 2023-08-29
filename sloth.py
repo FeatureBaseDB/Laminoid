@@ -1,5 +1,5 @@
 from InstructorEmbedding import INSTRUCTOR
-model = INSTRUCTOR('hkunlp/instructor-large')
+model = INSTRUCTOR('hkunlp/instructor-xl')
 
 from flask import Flask, request, jsonify
 
@@ -10,7 +10,10 @@ def embed():
     if request.method == 'POST':
         data = request.json  # Assuming the data is sent as JSON in the request body
 
-        embeddings = model.encode([data.get('sentence')]).tolist()
+        sentences = data.get('sentences')
+        instruction = data.get('instruction')
+
+        embeddings = model.encode(data.get('sentences')).tolist()
 
         # Process the data and generate a response
         response_data = {
