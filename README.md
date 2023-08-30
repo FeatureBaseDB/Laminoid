@@ -2,7 +2,7 @@
 Laminoid is a stupid simple model instance manager for Google Compute. It provides a reverse proxy for "authentication". This type of boxing has been done before in production for many years with no issues. Your milage may vary.
 
 ## Models
-Laminoid deploys boxes onto Google Cloud. These boxes contain graphics cards, which can run models.
+Laminoid deploys boxes onto Google Cloud. These boxes contain graphics cards, which can run models. I'm sure there's someone working on doing this in Docker, but why waste a good life fiddling with such things?
 
 ### Instructor Embeddings
 Laminoid currently supports [Instructor Large](https://huggingface.co/hkunlp/instructor-large) or [Instructor XL](https://huggingface.co/hkunlp/instructor-xl). Instructor also has a [whitepaper](https://arxiv.org/abs/2212.09741) you can read.
