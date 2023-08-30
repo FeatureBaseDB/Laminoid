@@ -43,6 +43,7 @@ To embed something, use curl:
 
 ```
 curl -X POST \
+     -u sloth:f00bar \
      -H "Content-Type: application/json" \
      -d '{"sentences": ["The sun rises in the east.", "Cats are curious animals.", "Rainbows appear after the rain."]}' \
      https://box-ip:8888/embed
