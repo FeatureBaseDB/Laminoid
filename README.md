@@ -12,7 +12,7 @@ Subsequent improvements to this repo will add support for other models, like Lla
 ## Flask/NGINX Token Setup
 This deployment uses a simple token assigned to the network tags on the box when it starts. On the box you start these on (fastener box coming soon) you'll create a `secrets.sh` file with the box token in it.
 
-Using the box requires a username/password via a reverse proxy. Put the username in `nginx.conf.sloth`.
+Using the box requires a username/password via a reverse proxy. The username is in `nginx.conf.sloth` and is `sloth`.
 
 ## Github Setup
 You could possibly move this to your own repo, changing things. If you do, change the `deploy_sloth.sh` script to reflect the Github repo.
