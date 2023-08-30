@@ -32,7 +32,8 @@ case $ZONE in
 esac
 
 # set this to your service account
-SERVICE_ACCOUNT="291267903070-compute@developer.gserviceaccount.com"
+SERVICE_ACCOUNT="mitta-us@appspot.gserviceaccount.com"
+GC_PROJECT="mitta-us"
 
 if [ -f secrets.sh ]; then
    source secrets.sh # truly, a travesty, sets TOKEN=token-[passphrase]
@@ -70,7 +71,7 @@ else
 
   # ai junk
   pip install --upgrade huggingface_hub
-  # if you load meta models, you'll also need:
+
   # huggingface_cli login
   
   # vllm takes forever
@@ -90,7 +91,6 @@ else
   python3 token.py beast
 
   # fschat
-  # we should install it, but we don't
 
   # requirements (for Instructor only right now)
   cd /opt/Laminoid
@@ -106,7 +106,7 @@ EOF
 )
 
 gcloud compute instances create $NAME-$NEW_UUID \
---project=sloth-compute \
+--project=$GC_PROJECT \
 --zone=$ZONE \
 --machine-type=$TYPE \
 --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
@@ -128,10 +128,10 @@ gcloud compute instances create $NAME-$NEW_UUID \
 sleep 15
 
 # add data
-gcloud compute instances add-metadata $NAME-$NEW_UUID --zone $ZONE --metadata-from-file=shutdown-script=stop-beast.sh
+gcloud compute instances add-metadata $NAME-$NEW_UUID --zone $ZONE --metadata-from-file=shutdown-script=stop-sloth.sh
 
 IP=$(gcloud compute instances describe $NAME-$NEW_UUID --zone $ZONE  | grep natIP | cut -d: -f2 | sed 's/^[ \t]*//;s/[ \t]*$//')
 
-# gcloud compute firewall-rules create beast --target-tags beast --allow tcp:8389
+# gcloud compute firewall-rules create beast --target-tags beast --allow tcp:8888
 echo "Password token is: $TOKEN"
 echo "IP is: $IP"

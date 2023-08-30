@@ -7,7 +7,7 @@ Laminoid deploys boxes onto Google Cloud. These boxes contain graphics cards, wh
 ### Instructor Embeddings
 Laminoid currently supports [Instructor Large](https://huggingface.co/hkunlp/instructor-large) or [Instructor XL](https://huggingface.co/hkunlp/instructor-xl). Instructor also has a [whitepaper](https://arxiv.org/abs/2212.09741) you can read.
 
-Subsequent improvements to this repo will add support for other models, like Llama 2. We're going to need A100s to do this, however. Looking at you, Google.
+Subsequent improvements to this repo will add support for other models, like Llama 2. We're going to need A100s to do this without QLoRA, however. Looking at you, Google.
 
 ## Flask/NGINX Token Setup
 This deployment uses a simple token assigned to the network tags on the box when it starts. On the box you start these on (fastener box coming soon) you'll create a `secrets.sh` file with the box token in it.
@@ -18,7 +18,7 @@ Using the box requires a username/password via a reverse proxy. The username is 
 You could possibly move this to your own repo, changing things. If you do, change the `deploy_sloth.sh` script to reflect the Github repo.
 
 ## Google Compute Setup
-Change the `deploy_sloth.sh` script to use your Google service account. You can change zones, but the ones listed are known to have the L4s for boxes.
+Change the `deploy_sloth.sh` script to use your Google service account and project names. You can change zones, but the ones listed are known to have the L4s for boxes.
 
 You may want to change the number of GPUs attached if you like spending money.
 
@@ -29,14 +29,34 @@ Run this to deploy:
 ./deploy_sloth.sh --zone us-central1-a
 ```
 
+## Setup
+Setup the conda environment:
+
+```
+conda create -n sloth python=3.10
+conda activate sloth
+```
+
+Install the requirements:
+
+```
+pip install -r requirements.txt
+```
+
+Open up the firewall:
+
+```
+gcloud compute firewall-rules create beast --target-tags beast --allow tcp:8888
+```
+
 ## Use
 To run the Instruct service, enter the following from an ssh console into the box:
 
 ```
-./start-sloth.sh
+bash start-sloth.sh
 ```
 
-I'd put that in the deploy script, but I'm working on figuring out how to use `conda` to do it with another account, so I won't.
+I'd put all of this into the deploy script, but I'm working on figuring out how to use `conda` to do it automatically with another account besides root.
 
 ### Call It
 To embed something, use curl:
