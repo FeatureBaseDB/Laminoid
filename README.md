@@ -36,6 +36,8 @@ To run the Instruct service, enter the following from an ssh console into the bo
 ./start-sloth.sh
 ```
 
+I'd put that in the deploy script, but I'm working on figuring out how to use `conda` to do it with another account, so I won't.
+
 ### Call It
 To embed something, use curl:
 
