@@ -30,12 +30,24 @@ Run this to deploy:
 ```
 
 ## Use
-To run the service, enter the following from an ssh console into the box:
+To run the Instruct service, enter the following from an ssh console into the box:
 
 ```
 ./start-sloth.sh
 ```
 
+### Call It
+To embed something, use curl:
+
+```
+curl -X POST \
+     -H "Content-Type: application/json" \
+     -d '{"sentences": ["The sun rises in the east.", "Cats are curious animals.", "Rainbows appear after the rain."]}' \
+     https://box-ip:8888/embed
+```
+
+I had ChatGPT write that, so it could be wrong.
+
 ## NOTES
-CUDA runs out of memory sometimes, likely due to gunicorn threading loading a seperate model.
+CUDA runs out of memory sometimes, likely due to gunicorn threading loading a seperate model into the GPU. I have no idea what's going on with it so don't make that number bigger unless you want to figure it out.
 
