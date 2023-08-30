@@ -31,13 +31,16 @@ case $ZONE in
         ;;
 esac
 
+# set this to your service account
+SERVICE_ACCOUNT="291267903070-compute@developer.gserviceaccount.com"
+
 if [ -f secrets.sh ]; then
    source secrets.sh # truly, a travesty, sets TOKEN=token-[passphrase]
    echo "Here's where I say, hold on a second while we fire things up."
    gcloud compute project-info add-metadata --metadata token=$TOKEN
    echo;
 else
-   echo "Create 'secrets.sh', put a TOKEN=f00bar and SK=xxx statements in it and then rerun this script."
+   echo "Create 'secrets.sh', put a TOKEN=f00bar statements in it and then rerun this script."
    echo;
    exit;
 fi
@@ -59,20 +62,18 @@ else
   apt-get install python3-pip -y
   apt-get install git -y
   apt-get install gcc -y
-
-  # 5.10.0-24-cloud-amd64 headers
-  # sudo apt-get install linux-headers-5.10.0-24-cloud-amd64 -y
-  # sudo apt-get install linux-headers-5.15.0-1039-gcp
   
   # install cuda drivers
   cd /root/
-  # wget -q https://storage.googleapis.com/sloth-services/cuda_11.8.0_520.61.05_linux.run.3
-  # bash cuda_11.8.0_520.61.05_linux.run.3 --silent
   curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py
   python3 /root/install_gpu_driver.py
 
   # ai junk
   pip install --upgrade huggingface_hub
+  # if you load meta models, you'll also need:
+  # huggingface_cli login
+  
+  # vllm takes forever
   # pip install vllm 
 
   # download code
@@ -89,12 +90,11 @@ else
   python3 token.py beast
 
   # fschat
-  
-  # start training
-  # ./start-training.sh
+  # we should install it, but we don't
 
-  # start ai
-  # ./start-ai.sh
+  # requirements (for Instructor only right now)
+  cd /opt/Laminoid
+  pip install -r requirements.txt
 
   # restart ngninx
   systemctl restart nginx.service
@@ -114,7 +114,7 @@ gcloud compute instances create $NAME-$NEW_UUID \
 --maintenance-policy=TERMINATE \
 --provisioning-model=SPOT \
 --instance-termination-action=STOP \
---service-account=291267903070-compute@developer.gserviceaccount.com \
+--service-account=$SERVICE_ACCOUNT \
 --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
 --accelerator=count=2,type=nvidia-l4 \
 --create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/ml-images/global/images/c0-deeplearning-common-gpu-v20230807-debian-11-py310,mode=rw,size=200,type=projects/sloth-compute/zones/us-central1-a/diskTypes/pd-ssd \
