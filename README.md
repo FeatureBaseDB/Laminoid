@@ -20,7 +20,7 @@ You could possibly move this to your own repo, changing things. If you do, chang
 ## Google Compute Setup
 Change the `deploy_sloth.sh` script to use your Google service account. You can change zones, but the ones listed are known to have the L4s for boxes.
 
-You may want to change the number of GPUs attached.
+You may want to change the number of GPUs attached if you like spending money.
 
 ## Deploy
 Run this to deploy:
