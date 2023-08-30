@@ -12,7 +12,9 @@ Laminoid currently supports [Instructor Large](https://huggingface.co/hkunlp/ins
 Subsequent improvements to this repo will add support for other models, like Llama 2. We're going to need A100s to do this without QLoRA, however. Looking at you, Google.
 
 ## Flask/NGINX Token Setup
-This deployment uses a simple token assigned to the network tags on the box when it starts. On the box you start these on (fastener box coming soon) you'll create a `secrets.sh` file with the box token in it.
+This deployment uses a simple token assigned to the network tags on the box when it starts. For now, you'll need to start these manually. A fastener box for starting them via an API is coming soon, but you can do this from the Google Shell in the Google Cloud Console. 
+
+You'll create a `secrets.sh` file with the box token in it before you do the deployment below.
 
 Using the box requires a username/password via a reverse proxy. The username is in `nginx.conf.sloth` and is `sloth`.
 
@@ -25,13 +27,15 @@ Change the `deploy_sloth.sh` script to use your Google service account and proje
 You may want to change the number of GPUs attached if you like spending money.
 
 ## Deploy
-Run this to deploy:
+Run this to deploy the box:
 
 ```
 ./deploy_sloth.sh --zone us-central1-a
 ```
 
 ## Setup
+SSH into the box and then run the following commands.
+
 Setup the conda environment:
 
 ```
@@ -45,14 +49,14 @@ Install the requirements:
 pip install -r requirements.txt
 ```
 
-Open up the firewall:
+Open up the firewall (on the box or the shell you deployed from):
 
 ```
 gcloud compute firewall-rules create beast --target-tags beast --allow tcp:8888
 ```
 
 ## Use
-To run the Instruct service, enter the following from an ssh console into the box:
+To run the Instruct service, enter the following from an SSH console into the box:
 
 ```
 bash start-sloth.sh
@@ -61,7 +65,7 @@ bash start-sloth.sh
 I'd put all of this into the deploy script, but I'm working on figuring out how to use `conda` to do it automatically with another account besides root.
 
 ### Call It
-To embed something, use curl:
+To embed something from somewhere, use curl:
 
 ```
 curl -X POST \
