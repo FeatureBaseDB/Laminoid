@@ -5,7 +5,9 @@ Laminoid is a stupid simple model instance manager for Google Compute. It provid
 Laminoid deploys boxes onto Google Cloud. These boxes contain graphics cards, which can run models.
 
 ### Instructor Embeddings
-Laminoid supports [Instructor Large](https://huggingface.co/hkunlp/instructor-large) or [Instructor XL](https://huggingface.co/hkunlp/instructor-xl). Instructor also has a [whitepaper](https://arxiv.org/abs/2212.09741) you can read.
+Laminoid currently supports [Instructor Large](https://huggingface.co/hkunlp/instructor-large) or [Instructor XL](https://huggingface.co/hkunlp/instructor-xl). Instructor also has a [whitepaper](https://arxiv.org/abs/2212.09741) you can read.
+
+Subsequent improvements to this repo will add support for other models, like Llama 2. We're going to need A100s to do this, however. Looking at you Google.
 
 ## Flask/NGINX Token Setup
 This deployment uses a simple token assigned to the network tags on the box when it starts. On the box you start these on (fastener box coming soon) you'll create a `secrets.sh` file with the box token in it.
