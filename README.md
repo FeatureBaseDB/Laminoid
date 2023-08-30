@@ -46,7 +46,7 @@ curl -X POST \
      -u sloth:f00bar \
      -H "Content-Type: application/json" \
      -d '{"sentences": ["The sun rises in the east.", "Cats are curious animals.", "Rainbows appear after the rain."]}' \
-     https://box-ip:8888/embed
+     http://box-ip:8888/embed
 ```
 
 I had ChatGPT write that, so it could be wrong.
