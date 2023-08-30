@@ -1,5 +1,7 @@
 # Laminoid
-Laminoid is a stupid simple model instance manager for Google Compute. It provides a reverse proxy for "authentication". This type of boxing has been done before in production for many years with no issues. Your milage may vary.
+Laminoid is a stupid simple instance manager for Google Compute to run machine learning models. 
+
+Laminoid provides a reverse proxy for "authentication".
 
 ## Models
 Laminoid deploys boxes onto Google Cloud. These boxes contain graphics cards, which can run models.
