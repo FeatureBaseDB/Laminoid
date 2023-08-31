@@ -79,7 +79,7 @@ def instance_status(zone, instance_id):
     try:
         result = compute.instances().get(
             project=project,
-            zone=f'{zone}',
+            zone=zone,
             instance=instance_id
         ).execute()
 
@@ -91,20 +91,18 @@ def instance_status(zone, instance_id):
 
     return jsonify(result)
 
-@app.route('/api/instance/<instance_id>/start', methods=['GET'])
-def start_instance(instance_id):
+@app.route('/api/instance/<zone>/<instance_id>/start', methods=['GET'])
+def start_instance(zone, instance_id):
     try:
         if request.args.get('token') != token:
             return jsonify({'error': "need token"})
     except:
         return jsonify({'error': "need token"})
 
-    regionint = instance_id[-2]
-    zonealpha = instance_id[-1]
     try:
         result = compute.instances().start(
             project=project,
-            zone='%s-%s' % (regions[int(regionint)], zonealpha),
+            zone=zone,
             instance=instance_id
         ).execute()
     except Exception as ex:
