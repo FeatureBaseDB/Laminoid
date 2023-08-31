@@ -37,10 +37,10 @@ fi
 
 case $ZONE in
     us-central1-a)
-        echo "Using $ZONE to start sloth..."
+        echo "Using $ZONE to start $NAME-$NEW_UUID..."
         ;;
     us-east1-b)
-        echo "Using $ZONE to start sloth..."
+        echo "Using $ZONE to start $NAME-$NEW_UUID..."
         ;;
     *)
         echo "Invalid zone specified: $ZONE"
