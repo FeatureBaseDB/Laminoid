@@ -7,10 +7,10 @@ events {
 }
 http {
         upstream controller {
-                server localhost:8888;
+                server localhost:7878;
         }
         server {
-                listen  8888;
+                listen  8787;
                 location / {
                         auth_basic "controller";
                         auth_basic_user_file /etc/nginx/htpasswd;

@@ -3,7 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 .DS_Store
-
+controller/secrets.sh
+sloth/secrets.sh
 # C extensions
 *.so
 
