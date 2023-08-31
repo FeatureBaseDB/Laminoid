@@ -1,3 +1,3 @@
 #!/bin/bash
 
-gunicorn -b :8888 controller:app
+gunicorn -b :7878 controller:app
