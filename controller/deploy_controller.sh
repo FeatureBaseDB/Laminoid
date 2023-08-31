@@ -120,7 +120,7 @@ gcloud compute instances create $NAME-$NEW_UUID \
 --zone=$ZONE \
 --machine-type=$TYPE \
 --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
-$IP \
+$SUBNET \
 --no-restart-on-failure \
 $PREEMPTIBLE \
 --service-account=$SERVICE_ACCOUNT \
