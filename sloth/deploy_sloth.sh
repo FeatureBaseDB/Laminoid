@@ -6,7 +6,6 @@ NEW_UUID=$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom | head -c 4 ; echo)
 ZONE=$2
 OPTION=$1
 PREEMPTIBLE="--preemptible"
-UBUNTU_VERSION="ubuntu-2204-jammy-v20230114"
 IP=""
 
 echo "This instance is preemtible, unless it's started with --prod";
@@ -20,10 +19,10 @@ esac
 
 case $ZONE in
     us-central1-a)
-        echo "Using $ZONE to start beast..."
+        echo "Using $ZONE to start sloth..."
         ;;
     us-east1-b)
-        echo "Using $ZONE to start beast..."
+        echo "Using $ZONE to start sloth..."
         ;;
     *)
         echo "Need a valid zone to start, such as us-central1-a or us-east1-b"
@@ -32,8 +31,8 @@ case $ZONE in
 esac
 
 # set this to your service account
-SERVICE_ACCOUNT="mitta-us@appspot.gserviceaccount.com"
-GC_PROJECT="mitta-us"
+SERVICE_ACCOUNT="sloth-compute@appspot.gserviceaccount.com"
+GC_PROJECT="sloth-compute"
 
 if [ -f secrets.sh ]; then
    source secrets.sh # truly, a travesty, sets TOKEN=token-[passphrase]
@@ -69,7 +68,22 @@ else
   curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py
   python3 /root/install_gpu_driver.py
 
-  # ai junk
+  # download code
+  cd /opt/
+  git clone https://github.com/FeatureBaseDB/Laminoid.git
+  cd /opt/Laminoid/sloth
+
+  # copy files
+  cp bid_token.py /root/
+  cp nginx.conf.sloth /etc/nginx/nginx.conf
+
+  # grab the tokens and write to nginx htpasswrd and env
+  cd /root
+  python3 bid_token.py sloth
+
+  # fschat
+
+  # huggingface
   pip install --upgrade huggingface_hub
 
   # huggingface_cli login
@@ -77,23 +91,8 @@ else
   # vllm takes forever
   # pip install vllm 
 
-  # download code
-  cd /opt/
-  git clone https://github.com/FeatureBaseDB/Laminoid.git
-  cd /opt/Laminoid/
-
-  # copy files
-  cp token.py /root/
-  cp nginx.conf.beast /etc/nginx/nginx.conf
-
-  # grab the tokens and write to nginx htpasswrd and env
-  cd /root
-  python3 token.py beast
-
-  # fschat
-
   # requirements (for Instructor only right now)
-  cd /opt/Laminoid
+  cd /opt/Laminoid/sloth
   pip install -r requirements.txt
 
   # restart ngninx
@@ -117,7 +116,7 @@ gcloud compute instances create $NAME-$NEW_UUID \
 --service-account=$SERVICE_ACCOUNT \
 --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
 --accelerator=count=2,type=nvidia-l4 \
---create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/ml-images/global/images/c0-deeplearning-common-gpu-v20230807-debian-11-py310,mode=rw,size=200,type=projects/sloth-compute/zones/us-central1-a/diskTypes/pd-ssd \
+--create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/ml-images/global/images/c0-deeplearning-common-gpu-v20230807-debian-11-py310,mode=rw,size=200,type=projects/$GC_PROJECT/zones/$ZONE/diskTypes/pd-ssd \
 --no-shielded-secure-boot \
 --shielded-vtpm \
 --shielded-integrity-monitoring \

@@ -3,8 +3,10 @@ Laminoid is a stupid simple instance manager for Google Compute to run machine l
 
 Laminoid provides a reverse proxy for "authentication".
 
-## Models
+## Boxes that Run Models
 Laminoid deploys boxes onto Google Cloud. These boxes contain graphics cards, which can run models.
+
+Laminoid also deploys a controller box, which may list, start or stop a box which runs models. The controller box is not allowed to create instance, however.
 
 ### Instructor Embeddings
 Laminoid currently supports [Instructor Large](https://huggingface.co/hkunlp/instructor-large) or [Instructor XL](https://huggingface.co/hkunlp/instructor-xl). Instructor also has a [whitepaper](https://arxiv.org/abs/2212.09741) you can read.
@@ -12,29 +14,34 @@ Laminoid currently supports [Instructor Large](https://huggingface.co/hkunlp/ins
 Subsequent improvements to this repo will add support for other models, like Llama 2. We're going to need A100s to do this without QLoRA, however. Looking at you, Google.
 
 ## Flask/NGINX Token Setup
-This deployment uses a simple token assigned to the network tags on the box when it starts. For now, you'll need to start these manually. A fastener box for starting them via an API is coming soon, but you can do this from the Google Shell in the Google Cloud Console. 
+This deployment uses a simple token assigned to the network tags on the box when it starts. These tokens are assigned from a file.
 
 You'll create a `secrets.sh` file with the box token in it before you do the deployment below.
 
-Using the box requires a username/password via a reverse proxy. The username is in `nginx.conf.sloth` and is `sloth`.
+Using a box's endpoints requires a username/password via a reverse proxy. The username is in `nginx.conf.sloth` and is `sloth`.
 
 ## Github Setup
-You could possibly move this to your own repo, changing things. If you do, change the `deploy_sloth.sh` script to reflect the Github repo.
+You could possibly move this to your own repo, changing things. If you do, change the `deploy_sloth.sh` and `deploy_controller` scripts to reflect the Github repo.
 
 ## Google Compute Setup
-Change the `deploy_sloth.sh` script to use your Google service account and project names. You can change zones, but the ones listed are known to have the L4s for boxes.
+Change all deploy scripts to use your Google service account and project names. You can change zones, but the ones listed are known to have the L4s for boxes.
 
 You may want to change the number of GPUs attached if you like spending money.
 
 ## Deploy
-Run this to deploy the box:
+Run this to deploy a box that runs models:
 
 ```
-./deploy_sloth.sh --zone us-central1-a
+./sloth/deploy_sloth.sh --zone us-central1-a
+```
+
+Run this to deploy a controller box, that can start, stop and list the model boxes:
+```
+./controller/deploy_controller.sh --zone us-central1-a
 ```
 
 ## Setup
-SSH into the box and then run the following commands.
+For now, setup is done manually for model boxes. SSH into a model box and then run the following commands.
 
 Setup the conda environment:
 
@@ -59,6 +66,7 @@ gcloud compute firewall-rules create beast --target-tags beast --allow tcp:8888
 To run the Instruct service, enter the following from an SSH console into the box:
 
 ```
+cd /opt/Laminoid/sloth/
 bash start-sloth.sh
 ```
 

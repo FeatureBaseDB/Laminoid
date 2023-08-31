@@ -13,7 +13,10 @@ def embed():
         sentences = data.get('sentences')
         instruction = data.get('instruction')
 
-        embeddings = model.encode(data.get('sentences')).tolist()
+        if instruction:
+        	embeddings = model.encode(instruction, data.get('sentences')).tolist()
+		else:
+	        embeddings = model.encode(data.get('sentences')).tolist()
 
         # Process the data and generate a response
         response_data = {
