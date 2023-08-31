@@ -80,12 +80,12 @@ else
   apt-get install python3-pip -y
   apt-get install git -y
 
-  pip install google-cloud -y
-  pip install google-api-python-client -y
-  pip install google-auth-httplib2 -y
-  pip install gunicorn -y
-  pip install flask -y
-  
+  pip install google-cloud
+  pip install google-api-python-client
+  pip install google-auth-httplib2
+  pip install gunicorn
+  pip install flask
+
   # download code
   cd /opt/
   git clone https://github.com/FeatureBaseDB/Laminoid.git
