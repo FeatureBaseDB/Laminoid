@@ -1,1 +1,3 @@
-start-controller.sh
+#!/bin/bash
+
+gunicorn -b :8888 controller:app

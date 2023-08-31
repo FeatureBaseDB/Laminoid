@@ -1,1 +1,2 @@
-stop-controller.sh
+#!/bin/bash
+killall -9 gunicorn
