@@ -68,21 +68,18 @@ def list_instances():
         print("error: %s" % ex)
         return jsonify([])
 
-@app.route('/api/instance/<instance_id>/status', methods=['GET'])
-def instance_status(instance_id):
+@app.route('/api/instance/<zone>/<instance_id>/status', methods=['GET'])
+def instance_status(zone, instance_id):
     try:
         if request.args.get('token') != token:
             return jsonify({'error': "need token"})
     except:
         return jsonify({'error': "need token"})
 
-    regionint = instance_id[-2]
-    zonealpha = instance_id[-1]
-
     try:
         result = compute.instances().get(
             project=project,
-            zone='%s-%s' % (regions[int(regionint)], zonealpha),
+            zone=f'{zone}',
             instance=instance_id
         ).execute()
 
@@ -90,17 +87,7 @@ def instance_status(instance_id):
         if "HttpError" in str(ex):
             result = {'error': "NOTFOUND"}
         else:
-            print("here's an actual error: %s" % ex)
-            print("trying again")
-            try:
-                result = compute.instances().get(
-                    project=project,
-                    zone='%s-%s' % (regions[int(regionint)], zonealpha),
-                    instance=instance_id
-                ).execute()
-            except:
-                result = {}
-                print("here's an actual error: %s" % ex)
+            result = {'error': f"{ex}"}
 
     return jsonify(result)
 
