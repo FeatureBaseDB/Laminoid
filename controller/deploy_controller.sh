@@ -3,7 +3,9 @@ TYPE=e2-medium
 NAME=controller
 NEW_UUID=$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom | head -c 4 ; echo)
 
-IP=""
+IP="34.122.236.144"
+SUBNET="--subnet=default $IP"
+
 PREEMPTIBLE=" \
 --maintenance-policy=TERMINATE \
 --provisioning-model=SPOT \
@@ -22,13 +24,15 @@ for arg in "$@"; do
     esac
 done
 
-echo "This instance is preemtible, unless it's started with --prod";
 if [ "$PROD_MODE" == "true" ]; then
     unset PREEMPTIBLE
     echo "Production mode enabled..."
     IP=""
     echo
+else
+    echo "This instance is preemtible, unless it's started with --prod"
 fi
+
 
 if [ -z "$ZONE" ]; then
     echo "Need a valid zone to start [us-central1-a|us-east1-b]: --zone=us-central1-a"
@@ -92,7 +96,7 @@ else
   cd /opt/Laminoid/
 
   # copy files
-  cp token.py /root/
+  cp bid_token.py /root/
   cp nginx.conf.controller /etc/nginx/nginx.conf
 
   # grab the tokens and write to nginx htpasswrd and env
@@ -101,6 +105,9 @@ else
 
   # restart ngninx
   systemctl restart nginx.service
+
+  cd /opt/Laminoid/controller
+  ./start-controller.sh &
 
   date >> /opt/done.time
 
@@ -113,6 +120,7 @@ gcloud compute instances create $NAME-$NEW_UUID \
 --zone=$ZONE \
 --machine-type=$TYPE \
 --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
+$IP \
 --no-restart-on-failure \
 $PREEMPTIBLE \
 --service-account=$SERVICE_ACCOUNT \
