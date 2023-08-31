@@ -34,6 +34,7 @@ compute_beta = discovery.build('compute', 'beta', credentials=credentials)
 project = 'sloth-compute'
 zones = ['us-central1-a','us-east1-b']
 
+
 @app.route('/api/instance/list', methods=['GET'])
 def list_instances():
     try:
@@ -68,6 +69,7 @@ def list_instances():
         print("error: %s" % ex)
         return jsonify([])
 
+
 @app.route('/api/instance/<zone>/<instance_id>/status', methods=['GET'])
 def instance_status(zone, instance_id):
     try:
@@ -91,6 +93,7 @@ def instance_status(zone, instance_id):
 
     return jsonify(result)
 
+
 @app.route('/api/instance/<zone>/<instance_id>/start', methods=['GET'])
 def start_instance(zone, instance_id):
     try:
@@ -108,6 +111,26 @@ def start_instance(zone, instance_id):
     except Exception as ex:
         print("error: %s" % ex)
     return jsonify(result)
+
+
+@app.route('/api/instance/<zone>/<instance_id>/stop', methods=['GET'])
+def stop_instance(zone, instance_id):
+    try:
+        if request.args.get('token') != token:
+            return jsonify({'error': "need token"})
+    except:
+        return jsonify({'error': "need token"})
+
+    try:
+        result = compute.instances().stop(
+            project=project,
+            zone=zone,
+            instance=instance_id
+        ).execute()
+    except Exception as ex:
+        print("error: %s" % ex)
+    return jsonify(result)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
