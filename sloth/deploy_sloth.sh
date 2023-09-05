@@ -73,10 +73,10 @@ else
   apt-get install gcc -y
   
   # install cuda drivers
-  if [ ! -f "/root/install_gpu_driver.py" ]; then
+  if [ ! -f "driver-installed" ]; then
     cd /root/
-    curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py
-    python3 /root/install_gpu_driver.py
+    touch driver-installed
+    /opt/deeplearning/install-driver.sh
   fi
 
   # download code
