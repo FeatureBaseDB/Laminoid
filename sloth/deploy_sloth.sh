@@ -48,7 +48,10 @@ fi
 SCRIPT=$(cat <<EOF
 #!/bin/bash
 if [ -d "/opt/Laminoid/" ]; then
-  echo "starting beast"
+  echo "starting sloth services"
+  cd /opt/Laminoid/sloth
+  bash start-sloth.sh
+  
 else
   sudo su -
   date >> /opt/start.time
@@ -100,7 +103,7 @@ else
 
   # start sloth service
   bash start-sloth.sh
-  
+
   date >> /opt/done.time
 
 fi
