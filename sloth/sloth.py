@@ -10,7 +10,6 @@ app = Flask(__name__)
 def embed():
     if request.method == 'POST':
         data = request.json  # Assuming the data is sent as JSON in the request body
-
         text = data.get('text')
         model = data.get('model')
 

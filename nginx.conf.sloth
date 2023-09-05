@@ -7,10 +7,10 @@ events {
 }
 http {
         upstream sloth {
-                server localhost:8888;
+                server localhost:8989;
         }
         server {
-                listen  8888;
+                listen  9898;
                 location / {
                         auth_basic "sloth";
                         auth_basic_user_file /etc/nginx/htpasswd;
