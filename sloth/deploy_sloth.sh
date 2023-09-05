@@ -79,10 +79,6 @@ else
     python3 /root/install_gpu_driver.py
   fi
 
-  cd /root/
-  curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py
-  python3 /root/install_gpu_driver.py
-
   # download code
   cd /opt/
   git clone https://github.com/FeatureBaseDB/Laminoid.git
