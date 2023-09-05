@@ -3,10 +3,23 @@ TYPE=g2-standard-24
 NAME=sloth
 NEW_UUID=$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom | head -c 4 ; echo)
 
-ZONE=$2
-OPTION=$1
-PREEMPTIBLE="--preemptible"
-IP=""
+PREEMPTIBLE=" \
+--maintenance-policy=TERMINATE \
+--provisioning-model=SPOT \
+--instance-termination-action=STOP \
+"
+
+# load arguments
+for arg in "$@"; do
+    case $arg in
+        -z=*|--zone=*)
+            ZONE="${arg#*=}"
+            ;;
+        -p|--prod|--production)
+            PROD_MODE="true"
+            ;;
+    esac
+done
 
 if [ "$PROD_MODE" == "true" ]; then
     unset PREEMPTIBLE
@@ -17,18 +30,11 @@ else
     echo "This instance is preemtible, unless it's started with --prod"
 fi
 
-case $ZONE in
-    us-central1-a)
-        echo "Using $ZONE to start sloth..."
-        ;;
-    us-east1-b)
-        echo "Using $ZONE to start sloth..."
-        ;;
-    *)
-        echo "Need a valid zone to start, such as us-central1-a or us-east1-b"
-        exit
-        ;;
-esac
+
+if [ -z "$ZONE" ]; then
+    echo "Need a valid zone to start [us-central1-a|us-east1-b]: --zone=us-central1-a"
+    exit 1
+fi
 
 # set this to your service account
 SERVICE_ACCOUNT="sloth-compute@appspot.gserviceaccount.com"
@@ -51,7 +57,7 @@ if [ -d "/opt/Laminoid/" ]; then
   echo "starting sloth services"
   cd /opt/Laminoid/sloth
   bash start-sloth.sh
-  
+
 else
   sudo su -
   date >> /opt/start.time
@@ -116,9 +122,7 @@ gcloud compute instances create $NAME-$NEW_UUID \
 --machine-type=$TYPE \
 --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
 --no-restart-on-failure \
---maintenance-policy=TERMINATE \
---provisioning-model=SPOT \
---instance-termination-action=STOP \
+$PREEMPTIBLE \
 --service-account=$SERVICE_ACCOUNT \
 --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
 --accelerator=count=2,type=nvidia-l4 \
