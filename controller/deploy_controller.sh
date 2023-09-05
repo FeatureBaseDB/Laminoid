@@ -3,8 +3,7 @@ TYPE=e2-medium
 NAME=controller
 NEW_UUID=$(LC_ALL=C tr -dc 'a-z0-9' </dev/urandom | head -c 4 ; echo)
 
-IP="34.122.236.144"
-SUBNET="--subnet=default $IP"
+IP=34.122.236.144
 
 PREEMPTIBLE=" \
 --maintenance-policy=TERMINATE \
@@ -119,8 +118,7 @@ gcloud compute instances create $NAME-$NEW_UUID \
 --project=$GC_PROJECT \
 --zone=$ZONE \
 --machine-type=$TYPE \
---network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
-$SUBNET \
+--network-interface=address=$IP,network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
 --no-restart-on-failure \
 $PREEMPTIBLE \
 --service-account=$SERVICE_ACCOUNT \

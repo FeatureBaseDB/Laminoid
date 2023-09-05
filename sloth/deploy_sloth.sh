@@ -8,14 +8,14 @@ OPTION=$1
 PREEMPTIBLE="--preemptible"
 IP=""
 
-echo "This instance is preemtible, unless it's started with --prod";
-case $OPTION in
-    -p|--prod|--production)
-       unset PREEMPTIBLE
-       echo "Production mode enabled..."
-       IP=""
-       echo;
-esac
+if [ "$PROD_MODE" == "true" ]; then
+    unset PREEMPTIBLE
+    echo "Production mode enabled..."
+    IP=""
+    echo
+else
+    echo "This instance is preemtible, unless it's started with --prod"
+fi
 
 case $ZONE in
     us-central1-a)
@@ -98,6 +98,9 @@ else
   # restart ngninx
   systemctl restart nginx.service
 
+  # start sloth service
+  bash start-sloth.sh
+  
   date >> /opt/done.time
 
 fi
