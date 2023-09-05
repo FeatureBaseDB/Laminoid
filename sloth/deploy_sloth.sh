@@ -82,11 +82,11 @@ else
   # download code
   cd /opt/
   git clone https://github.com/FeatureBaseDB/Laminoid.git
-  cd /opt/Laminoid/sloth
+  cd /opt/Laminoid/
 
   # copy files
   cp bid_token.py /root/
-  cp ../nginx.conf.sloth /etc/nginx/nginx.conf
+  cp nginx.conf.sloth /etc/nginx/nginx.conf
 
   # grab the tokens and write to nginx htpasswrd and env
   cd /root
