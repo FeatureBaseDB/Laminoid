@@ -14,11 +14,11 @@ def embed():
         text = data.get('text')
         model = data.get('model')
 
-        if model = "instructor-xl":
+        if model == "instructor-xl":
             embeddings = xl.encode(data.get('text')).tolist()
         else:
             embeddings = large.encode(data.get('text')).tolist()
-            
+
         # Process the data and generate a response
         response_data = {
             "text": text,
