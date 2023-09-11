@@ -7,6 +7,7 @@ PREEMPTIBLE=" \
 --maintenance-policy=TERMINATE \
 --provisioning-model=SPOT \
 --instance-termination-action=STOP \
+--max-run-duration=3600s \
 "
 
 # load arguments
@@ -118,13 +119,12 @@ fi
 EOF
 )
 
-gcloud compute instances create $NAME-$NEW_UUID \
+gcloud beta compute instances create $NAME-$NEW_UUID \
 --project=$GC_PROJECT \
 --zone=$ZONE \
 --machine-type=$TYPE \
 --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
 --no-restart-on-failure \
---max-run-duration=3600s \
 $PREEMPTIBLE \
 --service-account=$SERVICE_ACCOUNT \
 --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
