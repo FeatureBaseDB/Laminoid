@@ -7,7 +7,6 @@ PREEMPTIBLE=" \
 --maintenance-policy=TERMINATE \
 --provisioning-model=SPOT \
 --instance-termination-action=STOP \
---max-run-duration=3600s \
 "
 
 # load arguments
@@ -119,7 +118,7 @@ fi
 EOF
 )
 
-gcloud beta compute instances create $NAME-$NEW_UUID \
+gcloud compute instances create $NAME-$NEW_UUID \
 --project=$GC_PROJECT \
 --zone=$ZONE \
 --machine-type=$TYPE \
