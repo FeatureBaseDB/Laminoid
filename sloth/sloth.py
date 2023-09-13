@@ -22,7 +22,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 # Load the FastText pre-trained model (English)
 # fasttext.util.download_model('en', if_exists='ignore')
-# ft = fasttext.load_model('cc.en.300.bin')
+ft = fasttext.load_model('cc.en.300.bin')
 
 from flask import Flask, request, jsonify
 
@@ -181,7 +181,7 @@ def keyterms():
         # Process the data and generate a response
         response_data = {
             "text": text,
-            "keyterms": _keyterms
+            "keyterms": keyterms
         }
 
         return jsonify(response_data)
