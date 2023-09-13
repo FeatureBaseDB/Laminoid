@@ -21,8 +21,8 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Load the FastText pre-trained model (English)
-fasttext.util.download_model('en', if_exists='ignore')
-ft = fasttext.load_model('cc.en.300.bin')
+# fasttext.util.download_model('en', if_exists='ignore')
+# ft = fasttext.load_model('cc.en.300.bin')
 
 from flask import Flask, request, jsonify
 
@@ -173,10 +173,15 @@ def keyterms():
                 if _word not in keyterms:
                     keyterms.append(_word[0])
 
+        _keyterms = []
+        for keyterm in keyterms:
+            if len(keyterm) > 2:
+                _keyterms.append(keyterm)
+
         # Process the data and generate a response
         response_data = {
             "text": text,
-            "keyterms": keyterms
+            "keyterms": _keyterms
         }
 
         return jsonify(response_data)
