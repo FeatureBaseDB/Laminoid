@@ -7,6 +7,7 @@ controller/secrets.sh
 sloth/secrets.sh
 # C extensions
 *.so
+cc.en.300.bin
 
 # Distribution / packaging
 .Python
