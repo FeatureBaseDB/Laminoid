@@ -21,5 +21,5 @@ json_payload=$(echo "{}" | jq --arg text "$input" '.text = [$text]')
 curl -X POST \
 -H "Content-Type: application/json" \
 -d "$json_payload" \
-"http://sloth:f230cb093dee8a500d0301950195d4de@34.133.235.18:9898/keyterms"
+"http://localhost:5000/keyterms"
 

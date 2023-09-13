@@ -27,6 +27,7 @@ ft = fasttext.load_model('cc.en.300.bin')
 from flask import Flask, request, jsonify
 
 import random
+import re
 
 app = Flask(__name__)
 
@@ -90,6 +91,16 @@ def keyterms():
         text = data.get('text')
         model = data.get('model')
 
+        if len(text) < 29:
+            words = re.findall(r'\b\w{2,}\b', text[0])
+
+            response_data = {
+                "text": text,
+                "keyterms": words
+            }
+
+            return jsonify(response_data)
+        
         # minilm extractor
         keywords_2 = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 2), top_n=15, highlight=False)
         keywords_1 = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 1), top_n=15, highlight=False)
@@ -104,6 +115,7 @@ def keyterms():
             
             keywords = h2_tokenizer.decode(output[0], skip_special_tokens=True)
             _keywords = []
+            
             for word in keywords.split(", "):
                 word = word.strip().lower()
                 if word in _text.lower():
