@@ -91,7 +91,7 @@ def keyterms():
         text = data.get('text')
         model = data.get('model')
 
-        if len(text) < 29:
+        if len(text[0]) < 29:
             words = re.findall(r'\b\w{2,}\b', text[0])
 
             response_data = {
@@ -115,7 +115,7 @@ def keyterms():
             
             keywords = h2_tokenizer.decode(output[0], skip_special_tokens=True)
             _keywords = []
-            
+
             for word in keywords.split(", "):
                 word = word.strip().lower()
                 if word in _text.lower():
