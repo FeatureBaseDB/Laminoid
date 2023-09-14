@@ -30,6 +30,15 @@ else
     echo "This instance is preemtible, unless it's started with --prod"
 fi
 
+# Check if there are any uncommitted changes in the Git repository
+if [[ $(git status --porcelain) ]]; then
+  echo "Error: There are uncommitted changes in the Git repository."
+  echo "Please commit or stash your changes before deploying."
+  exit 1
+else
+  echo "Git repository is up to date. Continuing with deployment..."
+  # Add your deployment script commands here
+fi
 
 if [ -z "$ZONE" ]; then
     echo "Need a valid zone to start [us-central1-a|us-east1-b]: --zone=us-central1-a"
