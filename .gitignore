@@ -8,6 +8,7 @@ sloth/secrets.sh
 # C extensions
 *.so
 cc.en.300.bin
+cc.en.300.bin.gz*
 
 # Distribution / packaging
 .Python

@@ -16,12 +16,9 @@ h2_tokenizer = AutoTokenizer.from_pretrained("transformer3/H2-keywordextractor")
 h2_model = AutoModelForSeq2SeqLM.from_pretrained("transformer3/H2-keywordextractor")
 
 # fasttext imports
-import fasttext.util
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Load the FastText pre-trained model (English)
-# fasttext.util.download_model('en', if_exists='ignore')
 ft = fasttext.load_model('cc.en.300.bin')
 
 from flask import Flask, request, jsonify

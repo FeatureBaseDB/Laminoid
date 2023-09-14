@@ -106,6 +106,9 @@ else
   cd /opt/Laminoid/sloth
   pip install -r requirements.txt
 
+  # download fasttext .bin
+  python3 download-fasttext.py
+
   # restart ngninx
   systemctl restart nginx.service
 
