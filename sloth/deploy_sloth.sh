@@ -32,11 +32,10 @@ fi
 
 # Check if there are any uncommitted changes in the Git repository
 if [[ $(git status --porcelain) ]]; then
-  echo "Error: There are uncommitted changes in the Git repository."
-  echo "Please commit or stash your changes before deploying."
+  echo "Failing to deploy as local directory is not committed to Github."
   exit 1
 else
-  echo "Git repository is up to date. Continuing with deployment..."
+  echo "Git repository is up to date."
   # Add your deployment script commands here
 fi
 
@@ -116,7 +115,7 @@ else
   pip install -r requirements.txt
 
   # download fasttext .bin
-  python3 download-fasttext.py
+  python3 download-fasttext.py &
 
   # restart ngninx
   systemctl restart nginx.service
