@@ -89,6 +89,16 @@ curl -X POST \
      http://sloth:<token>@box-ip:9898/embed
 ```
 
+Do something similar to extract keyterms:
+
+```
+curl -X POST \
+     -u sloth:f00bar \
+     -H "Content-Type: application/json" \
+     -d '{"sentences": ["The sun rises in the east.", "Cats are curious animals.", "Rainbows appear after the rain."]}' \
+     http://sloth:<token>@box-ip:9898/embed
+```
+
 ## NOTES
 CUDA runs out of memory sometimes, likely due to gunicorn threading loading a seperate model into the GPU. I have no idea what's going on with it so don't make that number bigger unless you want to figure it out.
 
