@@ -15,7 +15,7 @@ Laminoid also deploys a controller box, which may list, start or stop a box whic
 ### Instructor Embeddings
 Laminoid currently supports [Instructor Large](https://huggingface.co/hkunlp/instructor-large) or [Instructor XL](https://huggingface.co/hkunlp/instructor-xl). Instructor also has a [whitepaper](https://arxiv.org/abs/2212.09741) you can read.
 
-Laminoid supports keyterm extraction using a model ensemble. It uses BERT, G2 and Fasttext.
+Laminoid supports keyterm extraction using a model ensemble. It uses BERT, H2-keywordextractor, and Fasttext.
 
 Subsequent improvements to this repo will add support for other models, like Llama 2.
 
