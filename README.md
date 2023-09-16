@@ -1,7 +1,7 @@
 # Laminoid
 Laminoid is a stupid simple instance manager for Google Compute to run machine learning models. 
 
-![llama](https://raw.githubusercontent.com/FeatureBaseDB/Laminoid/main/static/llama2.png)
+![llama](https://raw.githubusercontent.com/FeatureBaseDB/Laminoid/main/static/llama2.png | width 240)
 
 Laminoid provides a reverse proxy for "authentication".
 
