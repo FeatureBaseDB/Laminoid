@@ -35,53 +35,75 @@ Change all deploy scripts to use your Google service account and project names. 
 You may want to change the number of GPUs attached if you like spending money.
 
 ## Deploy
+Run this to deploy a controller box, that can start, stop and list the model boxes:
+```
+./controller/deploy_controller.sh --zone us-central1-a --prod
+```
+
 Run this to deploy a box that runs models:
 
 ```
 ./sloth/deploy_sloth.sh --zone us-central1-a
 ```
 
-Run this to deploy a controller box, that can start, stop and list the model boxes:
-```
-./controller/deploy_controller.sh --zone us-central1-a --prod
-```
-
 If you are using the SlothAI pipeline project, You will need to add a static IP to the controller box to ensure it can be contactd by the app.
 
 ## Setup
-For now, setup is done manually for model boxes. SSH into a model box and then run the following commands.
-
-Setup the conda environment:
+Setup is done automatically on the model boxes by the deployment script. You may verify the service is running by SSH'ing to the box and issuing:
 
 ```
-conda create -n sloth python=3.10
-conda activate sloth
+sudo screen -x
 ```
+Detatch from the screen using ctrl-A, D. Alternately, you can ctrl-C the process to exit and it will start a new gunicorn.
 
-Install the requirements:
-
-```
-pip install -r requirements.txt
-```
-
-Open up the firewall (on the box or the shell you deployed from):
+Be sure to configure the firewall for remote calls using the token and the http authentiation provided by NGINX:
 
 ```
-gcloud compute firewall-rules create beast --target-tags beast --allow tcp:8888
+gcloud compute firewall-rules create beast --target-tags beast --allow tcp:9898
 ```
 
 ## Use
-To run the Instruct service, enter the following from an SSH console into the box:
+### Controller Services
+Use the controller's API to list all instances:
 
 ```
-cd /opt/Laminoid/sloth/
-bash start-sloth.sh
+curl -X GET \
+     -u sloth:f00bar \
+     -H "Content-Type: application/json" \
+     http://sloth:<token>@box-ip:9898/api/instance/list?token=<token>
 ```
 
-I'd put all of this into the deploy script, but I'm working on figuring out how to use `conda` to do it automatically with another account besides root.
+Get the status of a box:
 
-### Call It
-To embed something from somewhere, use curl:
+```
+curl -X GET \
+     -u sloth:f00bar \
+     -H "Content-Type: application/json" \
+     http://sloth:<token>@box-ip:9898/api/instance/<zone>/<instance_id>/status?token=<token>
+```
+
+Stop a box:
+
+```
+curl -X GET \
+     -u sloth:f00bar \
+     -H "Content-Type: application/json" \
+     http://sloth:<token>@box-ip:9898/api/instance/<zone>/<instance_id>/stop?token=<token>
+```
+
+Start a box:
+
+```
+curl -X GET \
+     -u sloth:f00bar \
+     -H "Content-Type: application/json" \
+     http://sloth:<token>@box-ip:9898/api/instance/<zone>/<instance_id>/start?token=<token>
+```
+
+### Sloth Services
+These boxes are set to be spot instances. They will eventually be terminated by Google. Use the start method above to start the instance if it is not running.
+
+To embed something from the APIs, use curl:
 
 ```
 curl -X POST \
@@ -98,7 +120,7 @@ curl -X POST \
      -u sloth:f00bar \
      -H "Content-Type: application/json" \
      -d '{"sentences": ["The sun rises in the east.", "Cats are curious animals.", "Rainbows appear after the rain."]}' \
-     http://sloth:<token>@box-ip:9898/embed
+     http://sloth:<token>@box-ip:9898/keyterms
 ```
 
 ## NOTES
