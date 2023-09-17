@@ -109,7 +109,7 @@ To embed something from the APIs, use curl:
 curl -X POST \
      -u sloth:f00bar \
      -H "Content-Type: application/json" \
-     -d '{"sentences": ["The sun rises in the east.", "Cats are curious animals.", "Rainbows appear after the rain."]}' \
+     -d '{"text": ["The sun rises in the east.", "Cats are curious animals.", "Rainbows appear after the rain."]}' \
      http://sloth:<token>@box-ip:9898/embed
 ```
 
@@ -119,7 +119,7 @@ Do something similar to extract keyterms:
 curl -X POST \
      -u sloth:f00bar \
      -H "Content-Type: application/json" \
-     -d '{"sentences": ["The sun rises in the east.", "Cats are curious animals.", "Rainbows appear after the rain."]}' \
+     -d '{"text": ["The sun rises in the east.", "Cats are curious animals.", "Rainbows appear after the rain."]}' \
      http://sloth:<token>@box-ip:9898/keyterms
 ```
 
