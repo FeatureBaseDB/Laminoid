@@ -1,4 +1,4 @@
-# Laminoid: Stupid Simple Instance Manager for Models
+# Laminoid: Simple Instance Manager for Models
 Laminoid is a stupid simple instance manager for Google Compute to run machine learning models. 
 
 <img src="https://raw.githubusercontent.com/FeatureBaseDB/Laminoid/main/static/llama2.png" width="240"/>
