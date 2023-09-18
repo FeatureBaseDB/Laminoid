@@ -3,6 +3,7 @@ from InstructorEmbedding import INSTRUCTOR
 xl = INSTRUCTOR('hkunlp/instructor-xl')
 large = INSTRUCTOR('hkunlp/instructor-large')
 
+
 # transformers, keybert, torch
 from transformers import AutoTokenizer, AutoModelForTokenClassification, AutoModelForSeq2SeqLM
 from transformers import pipeline
@@ -50,139 +51,114 @@ def embed():
         return jsonify(response_data)
 
 
-def consolidate_keywords(keywords_1, keywords_2, keywords_3):
-    # Convert each list to dictionaries for easy access
-    dict_keywords_1 = {k[0]: k[1] for k in keywords_1}
-    dict_keywords_2 = {k[0]: k[1] for k in keywords_2}
-    dict_keywords_3 = {k[0]: k[1] for k in keywords_3}
+def sigmoid_scaling(data):
+    values = np.array([item[1] for item in data])
+    min_val = np.min(values)
+    max_val = np.max(values)
 
-    # Increase weight of entities in keywords_1 by checking association in keywords_2
-    for entity, weight in dict_keywords_1.items():
-        entity_parts = entity.split()
-        for key in dict_keywords_2:
-            if all(part in key for part in entity_parts):
-                dict_keywords_1[entity] += dict_keywords_2[key]
+    # Apply the logistic (sigmoid) function to scale the values
+    scaled_values = 1 / (1 + np.exp(-(values - min_val) / (max_val - min_val)))
 
-    # Increase weight of words in keywords_3 by association in keywords_2
-    for word, weight in dict_keywords_3.items():
-        for key in dict_keywords_2:
-            if word in key.split():
-                dict_keywords_3[word] += dict_keywords_2[key]
+    scaled_data = [(item[0], scaled_values[i]) for i, item in enumerate(data)]
 
-    # Create a consolidated dictionary, ensuring we're only using numeric values
-    consolidated = {}
-    for d in [dict_keywords_1, dict_keywords_2, dict_keywords_3]:
-        for key, value in d.items():
-            if isinstance(value, (float, int)):  # Ensure the value is numeric
-                consolidated[key] = consolidated.get(key, 0) + value
+    return scaled_data
 
-    # Sort the consolidated list by weight
-    consolidated_list = sorted(consolidated.items(), key=lambda x: x[1], reverse=True)
-
-    return consolidated_list
-
+def add_or_update_keyword(keyword_list, new_keyword, new_weight):
+    # Iterate through the list of tuples
+    for i, (keyword, weight) in enumerate(keyword_list):
+        if keyword == new_keyword:
+            # If the keyword already exists, update its weight
+            keyword_list[i] = (new_keyword, weight + new_weight)
+            return keyword_list
+    
+    # If the keyword is not in the list, add it
+    keyword_list.append((new_keyword, new_weight))
+    return keyword_list
 
 @app.route('/keyterms', methods=['POST'])
 def keyterms():
-    if request.method == 'POST':
-        data = request.json  # Assuming the data is sent as JSON in the request body
-        text = data.get('text')
-        model = data.get('model')
+    data = request.json  # Assuming the data is sent as JSON in the request body
+    text = data.get('text')
+    model = data.get('model')
 
-        if len(text[0]) < 29:
-            words = re.findall(r'\b\w{2,}\b', text[0])
+    # loop over the text strings
+    keyterms = []
+    for _text in text:
+        # handle short entries
+        if len(_text) < 29:
+            ordered_keywords = re.findall(r'\b\w{2,}\b', _text)
+        else:
+            # minilm extractor
+            kw_keywords_2 = kw_model.extract_keywords([_text], keyphrase_ngram_range=(1, 2), top_n=15, highlight=False)
+            kw_keywords_1 = kw_model.extract_keywords([_text], keyphrase_ngram_range=(1, 1), top_n=15, highlight=False)
 
-            response_data = {
-                "text": text,
-                "keyterms": words
-            }
-
-            return jsonify(response_data)
-        
-        # minilm extractor
-        keywords_2 = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 2), top_n=15, highlight=False)
-        keywords_1 = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 1), top_n=15, highlight=False)
-
-        # h2 extractor
-        keywords_3 = []
-        for _text in text:
-            _keywords = []
             input_ids = h2_tokenizer(_text, return_tensors="pt").input_ids
             with torch.no_grad():
                 output = h2_model.generate(input_ids, max_length=200)
             
-            keywords = h2_tokenizer.decode(output[0], skip_special_tokens=True)
-            _keywords = []
+            h2_keywords = h2_tokenizer.decode(output[0], skip_special_tokens=True).lower()
 
-            for word in keywords.split(", "):
-                word = word.strip().lower()
-                if word in _text.lower():
-                    weight = 0.50
-                else:
-                    weight = 0.25
+            # keyword list
+            keywords = []
 
-                word_found = False
-                for _x in _keywords:
-                    if word in _x[0]:
-                        word_found = True
-                        break
-                if not word_found:
-                    _keywords.append((word, weight))
+            # loop through singles (kw_keywords_1)
+            for i, _kw_keyword_1 in enumerate(kw_keywords_1):
+                for j, _kw_keyword_2 in enumerate(kw_keywords_2):
+                    if _kw_keyword_1[0] in _kw_keyword_2[0] and _kw_keyword_2[0] not in [item[0] for item in keywords]:
+                        keywords.append((_kw_keyword_2[0], _kw_keyword_1[1] + _kw_keyword_2[1]))
 
-            keywords_3.append(_keywords)
+            # Split the input text by commas
+            if "," in h2_keywords:
+                items = h2_keywords.split(',')
+                boost = 0.25
+                multi = True
+            else:
+                items = h2_keywords.split(' ')
+                boost = 0.1
+                multi = False
 
-        # Example usage
-        final_keywords = consolidate_keywords(keywords_1, keywords_2, keywords_3)
-
-        phrases = []
-        for final_keyword in final_keywords:
-            phrases.append(final_keyword[0])
+            # update the list
+            for item in items:
+                item = item.strip().lower()
+                keywords = add_or_update_keyword(keywords, item, boost)
 
 
-        # Encode the phrases
-        phrase_embeddings = [ft[phrase] for phrase in phrases]
+            # Encode the phrases
+            embeddings = [ft[keyword[0]] for keyword in keywords]
 
-        # Convert phrase embeddings to numpy arrays
-        phrase_embeddings = np.array(phrase_embeddings)
+            # Convert phrase embeddings to numpy arrays
+            embeddings = np.array(embeddings)
 
-        # Calculate cosine similarity matrix
-        cosine_sim_matrix = cosine_similarity(phrase_embeddings)
+            # Calculate cosine similarity matrix
+            cosine_sim_matrix = cosine_similarity(embeddings)
 
-        # Print the cosine similarity matrix
-        keyterms = []
+            for i, phrase1 in enumerate(keywords):
+                max = 0
+                max_keyterm = ""
+                for j, phrase2 in enumerate(keywords):
+                    similarity = cosine_sim_matrix[i, j]
+                    if similarity != "1":
+                        if similarity > max:
+                            max = similarity
+                            max_keyterm = phrase2[0]
+                keywords = add_or_update_keyword(keywords, max_keyterm, similarity)
 
-        for i, phrase1 in enumerate(phrases):
-            max = 0
-            keyterm = ""
-            for j, phrase2 in enumerate(phrases):
-                similarity = cosine_sim_matrix[i, j]
-                if similarity != "1":
-                    if similarity > max:
-                        max = similarity
-                        keyterm = phrase2
-            if keyterm not in keyterms:
-                keyterms.append(keyterm)
+            scaled_keywords = sigmoid_scaling(keywords)
 
-        # add random keyterms from keywords_3
-        selected_words = random.sample(keywords_3, len(keywords_3))
+            sorted_keywords = sorted(scaled_keywords, key=lambda x: x[1], reverse=True)
 
-        for _selection in selected_words:
-            for _word in _selection:
-                if _word not in keyterms:
-                    keyterms.append(_word[0])
+            ordered_keywords = [item[0] for item in sorted_keywords]
 
-        _keyterms = []
-        for keyterm in keyterms:
-            if len(keyterm) > 2:
-                _keyterms.append(keyterm)
+        # end if
+        keyterms.append(ordered_keywords)
 
-        # Process the data and generate a response
-        response_data = {
-            "text": text,
-            "keyterms": keyterms
-        }
+    # Process the data and generate a response
+    response_data = {
+        "text": text,
+        "keyterms": keyterms
+    }
 
-        return jsonify(response_data)
+    return jsonify(response_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
