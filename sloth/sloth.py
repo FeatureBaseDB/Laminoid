@@ -78,7 +78,7 @@ def add_or_update_keyword(keyword_list, new_keyword, new_weight):
 @app.route('/keyterms', methods=['POST'])
 def keyterms():
     data = request.json  # Assuming the data is sent as JSON in the request body
-    text = data.get('text')
+    text = data.get('data').get('text')
     model = data.get('model')
 
     # loop over the text strings
