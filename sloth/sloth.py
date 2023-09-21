@@ -16,7 +16,7 @@ kw_model = KeyBERT(SentenceTransformer("all-MiniLM-L6-v2"))
 h2_tokenizer = AutoTokenizer.from_pretrained("transformer3/H2-keywordextractor")
 h2_model = AutoModelForSeq2SeqLM.from_pretrained("transformer3/H2-keywordextractor")
 random_card = random.choice([0, 1])
-h2_model = h2_model.to(f'cuda:{random_card})')
+h2_model = h2_model.to(f'cuda:{random_card}')
 
 # fasttext imports
 import numpy as np
