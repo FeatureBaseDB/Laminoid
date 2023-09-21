@@ -3,7 +3,6 @@ from InstructorEmbedding import INSTRUCTOR
 xl = INSTRUCTOR('hkunlp/instructor-xl')
 large = INSTRUCTOR('hkunlp/instructor-large')
 
-
 # transformers, keybert, torch
 from transformers import AutoTokenizer, AutoModelForTokenClassification, AutoModelForSeq2SeqLM
 from transformers import pipeline
@@ -12,9 +11,12 @@ from keybert import KeyBERT
 import torch
 
 # load bert/h2 models
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 kw_model = KeyBERT(SentenceTransformer("all-MiniLM-L6-v2"))
 h2_tokenizer = AutoTokenizer.from_pretrained("transformer3/H2-keywordextractor")
 h2_model = AutoModelForSeq2SeqLM.from_pretrained("transformer3/H2-keywordextractor")
+random_card = random.choice([0, 1])
+h2_model = h2_model.to(f'cuda:{random_card})')
 
 # fasttext imports
 import numpy as np
@@ -27,6 +29,9 @@ from flask import Flask, request, jsonify
 
 import random
 import re
+import logging
+
+logging.basicConfig(filename='sloth.log', level=logging.INFO)
 
 app = Flask(__name__)
 
@@ -47,6 +52,9 @@ def embed():
             "text": text,
             "embeddings": embeddings
         }
+
+        log_line = f"Received POST request to /embed with text: '{text}'. Responding with embeddings."
+        app.logger.info(log_line)
 
         return jsonify(response_data)
 
@@ -92,10 +100,12 @@ def keyterms():
             kw_keywords_2 = kw_model.extract_keywords([_text], keyphrase_ngram_range=(1, 2), top_n=15, highlight=False)
             kw_keywords_1 = kw_model.extract_keywords([_text], keyphrase_ngram_range=(1, 1), top_n=15, highlight=False)
 
-            input_ids = h2_tokenizer(_text, return_tensors="pt").input_ids
+            input_ids = h2_tokenizer(_text, return_tensors="pt").input_ids.to(f'cuda:{random_card}')
+            # input_ids = h2_tokenizer(_text, return_tensors="pt").input_ids
             with torch.no_grad():
                 output = h2_model.generate(input_ids, max_length=200)
             
+
             h2_keywords = h2_tokenizer.decode(output[0], skip_special_tokens=True).lower()
 
             # keyword list
@@ -157,6 +167,9 @@ def keyterms():
         "text": text,
         "keyterms": keyterms
     }
+
+    log_line = f"Received POST request to /keyterms with text: '{text}'. Responding with keyterms: {keyterms}."
+    app.logger.info(log_line)
 
     return jsonify(response_data)
 
